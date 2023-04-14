@@ -1,7 +1,12 @@
 import tkinter
 from tkinter import ttk
-
 import sv_ttk
+
+import sympy
+from sympy.plotting.plot import plot3d
+
+import solution
+
 class RadioButtonKind(ttk.LabelFrame):
     def __init__(self, parent, controller):
         super().__init__(parent, text="Выберите вид уравнения", padding=15)
@@ -58,41 +63,55 @@ class InputsAndButtonsDemo(ttk.LabelFrame):
 
         self.add_widgets()
 
-        self.bind_int_widgets()
-
     def update_controller(self):
-        self.controller['a'] = self.int_entry_a.get()
-        self.controller['l'] = self.int_entry_l.get()
-        self.controller['phi1'] = self.entry_phi1.get()
+
+        self.controller['a'] = self.entry_a.get()
+        self.controller['l'] = self.entry_l.get()
+        self.controller['phi1'] =  self.entry_phi1.get()
         self.controller['phi2'] = self.entry_phi2.get()
         self.controller['f'] = self.entry_f.get()
 
-        print(self.controller)
+        print('Данные обновлены:  ', self.controller)
+
+        x, t = sympy.symbols('x t')
+        u, dict = solution.get_result(self.controller)
+
+        print(f'Результат: U(X,t) = {u}')
+
+        if self.controller['type'] == 0:
+            plot3d(u, (x, 0, dict['l']), (t, 0, 5), title=f"U(X, t) = {u}", )
+        else:
+            plot3d(u.diff(x), (x, 0, dict['l']), (t, 0, 5), title=f"U(X, t) = {u}")
 
     def add_widgets(self):
         self.label_a = ttk.Label(self, text = "A")
         self.label_a.grid(row=0, column=0, padx=5, pady=(0, 10), sticky="ew")
-        self.int_entry_a = ttk.Entry(self)
-        self.int_entry_a.grid(row=0, column=1, padx=5, pady=(0, 10), sticky="ew")
+        self.entry_a = ttk.Entry(self)
+        self.entry_a.insert(0, 0)
+        self.entry_a.grid(row=0, column=1, padx=5, pady=(0, 10), sticky="ew")
 
         self.label_l = ttk.Label(self, text="Длина стержня l")
         self.label_l.grid(row=1, column=0, padx=5, pady=(0, 10), sticky="ew")
-        self.int_entry_l = ttk.Entry(self)
-        self.int_entry_l.grid(row=1, column=1, padx=5, pady=(0, 10), sticky="ew")
+        self.entry_l = ttk.Entry(self)
+        self.entry_l.insert(0, 0)
+        self.entry_l.grid(row=1, column=1, padx=5, pady=(0, 10), sticky="ew")
 
         self.label_phi1 = ttk.Label(self, text="U(X,0)")
         self.label_phi1.grid(row=2, column=0, padx=5, pady=(0, 10), sticky="ew")
         self.entry_phi1 = ttk.Entry(self)
+        self.entry_phi1.insert(0, 0)
         self.entry_phi1.grid(row=2, column=1, padx=5, pady=(0, 10), sticky="ew")
 
         self.label_phi2 = ttk.Label(self, text="dU/dt(X,0)")
         self.label_phi2.grid(row=3, column=0, padx=5, pady=(0, 10), sticky="ew")
         self.entry_phi2 = ttk.Entry(self)
+        self.entry_phi2.insert(0, 0)
         self.entry_phi2.grid(row=3, column=1, padx=5, pady=(0, 10), sticky="ew")
 
         self.label_f = ttk.Label(self, text="Неоднородность F(X,t)")
         self.label_f.grid(row=4, column=0, padx=5, pady=(0, 10), sticky="ew")
         self.entry_f = ttk.Entry(self)
+        self.entry_f.insert(0, 0)
         self.entry_f.grid(row=4, column=1, padx=5, pady=(0, 10), sticky="ew")
 
         self.separator = ttk.Separator(self)
@@ -100,34 +119,6 @@ class InputsAndButtonsDemo(ttk.LabelFrame):
 
         self.accentbutton = ttk.Button(self, text="Получить результат", style="Accent.TButton", command = self.update_controller)
         self.accentbutton.grid(row=7, column=0, padx=5, pady=10, sticky="ew", columnspan=2)
-
-    def bind_int_widgets(self):
-        self.int_entry_a.bind("<FocusOut>", self.validate_int)
-        self.int_entry_a.bind("<FocusIn>", self.validate_int)
-        self.int_entry_a.bind("<KeyRelease>", self.validate_int)
-
-        self.int_entry_l.bind("<FocusOut>", self.validate_int)
-        self.int_entry_l.bind("<FocusIn>", self.validate_int)
-        self.int_entry_l.bind("<KeyRelease>", self.validate_int)
-
-    def validate_int(self, *_):
-        if self.int_entry_a.get() == "":
-            self.int_entry_a.state(["!invalid"])
-        else:
-            try:
-                int(self.int_entry_a.get())
-                self.int_entry_a.state(["!invalid"])
-            except ValueError:
-                self.int_entry_a.state(["invalid"])
-
-        if self.int_entry_l.get() == "":
-            self.int_entry_l.state(["!invalid"])
-        else:
-            try:
-                int(self.int_entry_l.get())
-                self.int_entry_l.state(["!invalid"])
-            except ValueError:
-                self.int_entry_l.state(["invalid"])
 
 class App(ttk.Frame):
     def __init__(self, parent, controller):
@@ -150,8 +141,8 @@ def main():
 
     app_data = {"kind": tkinter.IntVar(),
                 "type": tkinter.IntVar(),
-                "a": tkinter.IntVar(),
-                "l": tkinter.IntVar(),
+                "a": tkinter.StringVar(),
+                "l": tkinter.StringVar(),
                 "phi1": tkinter.StringVar(),
                 "phi2": tkinter.StringVar(),
                 "f": tkinter.StringVar()}
