@@ -1,4 +1,5 @@
 import heat_equation as he
+import wave_equation as we
 import sympy
 
 def get_result(controller):
@@ -16,3 +17,9 @@ def get_result(controller):
 
     if controller['kind'] == 0 and controller['type'] == 1:
         return he.solve_linear_combination_Neiman(phi1, a, f), controller
+
+    if controller['kind'] == 1 and controller['type'] == 0:
+        return we.solve_linear_combination_Dirichlet(phi1, phi2, a, f), controller
+
+    if controller['kind'] == 1 and controller['type'] == 1:
+        return we.solve_linear_combination_Neiman(phi1, phi2, a, f), controller

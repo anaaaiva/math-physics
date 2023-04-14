@@ -3,7 +3,7 @@ import nonuniformity as non_u
 import sympy
 from sympy.core.expr import Expr
 
-def solve_linear_combination_Dirichlet (expression: Expr, a, nonuniformity: Expr = None) :
+def solve_linear_combination_Dirichlet(expression: Expr, a, nonuniformity: Expr = None) :
     t, x = sympy.symbols('t x')
 
     additional = sympy.Number(0) if nonuniformity == None else non_u.calculate_partial_solution(*non_u.devide_into_two(nonuniformity), a)
@@ -30,7 +30,7 @@ def solve_linear_combination_Dirichlet (expression: Expr, a, nonuniformity: Expr
         ans +=  coef * sympy.exp(-a**2 * n**2 * t) * sympy.sin(n * x)
     return ans - additional
 
-def solve_linear_combination_Neiman (expression: Expr, a, nonuniformity: Expr = None):
+def solve_linear_combination_Neiman(expression: Expr, a, nonuniformity: Expr = None):
     t, x = sympy.symbols('t x')
 
     additional = sympy.Number(0) if (nonuniformity == None) else non_u.calculate_partial_solution(*non_u.devide_into_two(nonuniformity), a)
